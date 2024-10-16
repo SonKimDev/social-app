@@ -1,20 +1,22 @@
 import { StyleSheet, Text, TextInput, View, ViewStyle } from 'react-native'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { theme } from '../constants/theme';
 import { hp } from '../helpers/common';
 
 interface Props {
-  icon?: ViewStyle,
-  containerStyles?: any,
+  icon?: ReactNode,
+  containerStyles?: ViewStyle,
   inputRef?: any,
   placeholder?: string,
   secureTextEntry?: boolean,
+  value?: string,
+  multiline?: boolean,
   onChangeText?: (text: string) => void,
 }
 
 export default function Input(props: Props) {
 
-  const { icon, containerStyles, inputRef, placeholder, secureTextEntry = false, onChangeText } = props;
+  const { icon, containerStyles, inputRef, placeholder, secureTextEntry = false, value='', multiline = false, onChangeText } = props;
 
   return (
     <View style={[styles.container, containerStyles]}>
@@ -28,6 +30,8 @@ export default function Input(props: Props) {
         placeholder={placeholder}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
+        value={value}
+        multiline={multiline}
       />
     </View>
   )
