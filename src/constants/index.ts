@@ -1,0 +1,2 @@
+export const supabaseUrl = 'https://bylpranfcirqaudivfpo.supabase.co';
+export const supabaseAnonkey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5bHByYW5mY2lycWF1ZGl2ZnBvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg4ODk4NDgsImV4cCI6MjA0NDQ2NTg0OH0.j8Qh2dh7SBJwQ27AIXqLjCLYCKSP6msdfyThJMwqLtU';
