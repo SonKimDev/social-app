@@ -1,46 +1,29 @@
-import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import ArrowLeft from './ArrowLeft'
-import Call from './Call'
-import Camera from './Camera'
-import Comment from './Comment'
-import Delete from './Delete'
-import Edit from './Edit'
-import Heart from './Heart'
-import Home from './Home'
-import Image from './Image'
-import Location from './Location'
-import Lock from './Lock'
-import Logout from './Logout'
-import Mail from './Mail'
-import Plus from './Plus'
-import Search from './Search'
-import Send from './Send'
-import Share from './Share'
-import User from './User'
-import Video from './Video'
+import { StyleSheet } from 'react-native'
+import { Home01Icon, CallIcon, Camera01Icon, Comment01Icon, Delete01Icon, Edit01Icon, FavouriteIcon, MoreHorizontalIcon, ArrowLeft01Icon, Image01Icon, Location01Icon, LockIcon, Logout01Icon, Mail01Icon, PlusSignCircleIcon, Search01Icon, MailSend01Icon, Share01Icon, UserAccountIcon, Video01Icon } from 'hugeicons-react-native'
 import { theme } from '../../constants/theme'
 
 const icons = {
-  arrowLeft: ArrowLeft,
-  call: Call,
-  camera: Camera,
-  comment: Comment,
-  delete: Delete,
-  edit: Edit,
-  heart: Heart,
-  home: Home,
-  image: Image,
-  location: Location,
-  lock: Lock,
-  logout: Logout,
-  mail: Mail,
-  plus: Plus,
-  search: Search,
-  send: Send,
-  share: Share,
-  user: User,
-  video: Video,
+  home: Home01Icon,
+  call: CallIcon,
+  camera: Camera01Icon,
+  comment: Comment01Icon,
+  delete: Delete01Icon,
+  edit: Edit01Icon,
+  heart: FavouriteIcon,
+  more: MoreHorizontalIcon,
+  arrowLeft: ArrowLeft01Icon,
+  image: Image01Icon,
+  location: Location01Icon,
+  lock: LockIcon,
+  logout: Logout01Icon,
+  mail: Mail01Icon,
+  plus: PlusSignCircleIcon,
+  search: Search01Icon,
+  send: MailSend01Icon,
+  share: Share01Icon,
+  user: UserAccountIcon,
+  video: Video01Icon,
 }
 
 interface Props {
@@ -50,22 +33,25 @@ interface Props {
   strokeWidth?: number,
   color?: string,
   size?: number,
+  fill?: string,
 }
 
 const Icon = (props: Props) => {
+  const { name, height = 24, width = 24, strokeWidth = 1.9, color = theme.colors.textLight, size = 24, fill = 'none' } = props;
 
-  
-  const { name, height = 24, width = 24, strokeWidth = 1.9, color = theme.colors.textLight, size = 24} = props;
-  
-  const IconComponent = icons[name];
+  const IconComponent = icons[name]; // Lấy icon động theo tên
+
+  if (!IconComponent) {
+    return null; // Nếu icon không tồn tại, trả về null hoặc component placeholder
+  }
 
   return (
     <IconComponent
-      height={height}
-      width={width}
-      strokeWidth={strokeWidth}
-      color={color}
-      size={size}
+      size={size} // Truyền size nếu cần
+      color={color} // Truyền màu
+      strokeWidth={strokeWidth} // Truyền strokeWidth
+      style={{ height, width }} // Nếu cần tùy chỉnh width, height
+      fill={fill}
     />
   )
 }

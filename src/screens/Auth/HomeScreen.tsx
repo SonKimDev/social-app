@@ -1,5 +1,5 @@
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { clearAuth } from '../../store/auth';
@@ -11,12 +11,50 @@ import Icon from '../../assets/icons';
 import Button from '../../components/Button';
 import { selectUserData } from '../../store/auth/selector';
 import Avatar from '../../components/Avatar';
+import { fetchPosts } from '../../services/postService';
+import PostCard from '../../components/PostCard';
+import Loading from '../../components/Loading';
+import { getUserData } from '../../services/userService';
+
+var limit = 0;
 
 export default function HomeScreen() {
   const user = useSelector(selectUserData);
-  console.log("user: ", user);
   
   const navigation = useNavigation();
+
+  const [posts, setPosts] = useState([]);
+
+  async function getPosts() {
+    limit = limit + 10;
+    let res = await fetchPosts(limit);
+    if (res.success) {
+      setPosts(res.data);
+    }
+  }
+
+  async function handlePostEvent(payload) {
+    if (payload.eventType == 'INSERT' && payload?.new?.id) {
+      let newPost = {...payload.new};
+      let res = await getUserData(newPost.userId);
+      newPost.user = res.success ? res.data : {};
+      setPosts(prevPosts => [newPost, ...prevPosts])
+    }
+    
+  }
+
+  useEffect(() => {
+    let postChannel = supabase
+    .channel('posts')
+    .on('postgres_changes', {event: '*', schema: 'public', table: 'posts'}, handlePostEvent)
+    .subscribe()
+    getPosts();
+
+    return () => {
+      supabase.removeChannel(postChannel);
+    }
+  }, [])
+  
 
   return (
     <ScreenWrapper bg='white'>
@@ -40,6 +78,20 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </View>
+
+        <FlatList
+          data={posts}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listStyle}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => <PostCard item={item} currentUser={user} navigation={navigation}/>}
+          ListFooterComponent={(
+            <View style={{marginVertical: posts.length === 0 ? 200 : 30}}>
+              <Loading/>
+            </View>
+          )}
+        />
+
       </View>
     </ScreenWrapper>
   )
