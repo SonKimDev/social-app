@@ -9,14 +9,13 @@ interface Props {
   inputRef?: any,
   placeholder?: string,
   secureTextEntry?: boolean,
-  value?: string,
   multiline?: boolean,
   onChangeText?: (text: string) => void,
 }
 
 export default function Input(props: Props) {
 
-  const { icon, containerStyles, inputRef, placeholder, secureTextEntry = false, value='', multiline = false, onChangeText } = props;
+  const { icon, containerStyles, inputRef, placeholder, secureTextEntry = false, multiline = false, onChangeText } = props;
 
   return (
     <View style={[styles.container, containerStyles]}>
@@ -30,8 +29,9 @@ export default function Input(props: Props) {
         placeholder={placeholder}
         onChangeText={onChangeText}
         secureTextEntry={secureTextEntry}
-        value={value}
         multiline={multiline}
+        autoCorrect={false}
+        autoCapitalize='none'
       />
     </View>
   )
