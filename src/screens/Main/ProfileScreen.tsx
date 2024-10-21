@@ -45,9 +45,6 @@ export default function ProfileScreen() {
     ])
   }
   
-
-  console.log(user);
-
   return (
     <ScreenWrapper bg='white'>
       <UserHeader user={user} navigation={navigation} handleLogout={() => handleLogout()}/>

@@ -1,10 +1,11 @@
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-import HomeScreen from '../screens/Auth/HomeScreen';
-import NewPostScreen from '../screens/Auth/NewPostScreen';
-import NotificationScreen from '../screens/Auth/NotificationScreen';
-import ProfileScreen from '../screens/Auth/ProfileScreen';
-import EditProfileScreen from '../screens/Auth/EditProfileScreen';
+import HomeScreen from '../screens/Main/HomeScreen';
+import NewPostScreen from '../screens/Main/NewPostScreen';
+import NotificationScreen from '../screens/Main/NotificationScreen';
+import ProfileScreen from '../screens/Main/ProfileScreen';
+import EditProfileScreen from '../screens/Main/EditProfileScreen';
+import PostDetailScreen from '../screens/Main/PostDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function MainNavigator() {
       <Stack.Screen name='NotificationScreen' component={NotificationScreen}/>
       <Stack.Screen name='ProfileScreen' component={ProfileScreen}/>
       <Stack.Screen name='EditProfileScreen' component={EditProfileScreen}/>
+      <Stack.Screen name='PostDetailScreen' component={PostDetailScreen} options={{presentation: 'modal'}}/>
     </Stack.Navigator>
   )
 }
