@@ -24,11 +24,19 @@ export default function HomeScreen() {
   const navigation = useNavigation();
 
   const [posts, setPosts] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
 
   async function getPosts() {
-    limit = limit + 10;
+    if (!hasMore) {
+      return null;
+    }
+
+    limit = limit + 4;
     let res = await fetchPosts(limit);
     if (res.success) {
+      if (posts.length === res.data.length) {
+        setHasMore(false);
+      }
       setPosts(res.data);
     }
   }
@@ -85,9 +93,17 @@ export default function HomeScreen() {
           contentContainerStyle={styles.listStyle}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => <PostCard item={item} currentUser={user} navigation={navigation}/>}
-          ListFooterComponent={(
+          onEndReached={() => {
+            getPosts();
+          }}
+          onEndReachedThreshold={0}
+          ListFooterComponent={hasMore ? (
             <View style={{marginVertical: posts.length === 0 ? 200 : 30}}>
               <Loading/>
+            </View>
+          ): (
+            <View style={{marginVertical: 30}}>
+              <Text style={styles.noPost}>No more posts</Text>
             </View>
           )}
         />

@@ -48,8 +48,6 @@ export default function EditProfileScreen() {
 
   async function onSubmit() {
     let userData = {...user};
-    console.log(userData);
-    
     let { name, phoneNumber, image, bio, address } = userData;
     if (!name || !phoneNumber || !bio || !address || !image) {
       Alert.alert('Profile', 'Please fill all the fields');
@@ -73,9 +71,6 @@ export default function EditProfileScreen() {
       navigation.goBack();
     }
     setLoading(false);
-
-    console.log('update user result: ', res);
-    
   }
 
   useEffect(() => {

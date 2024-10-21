@@ -1,18 +1,20 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import { Alert, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { theme } from '../constants/theme';
-import { hp, wp } from '../helpers/common';
+import { hp, stripHtmlTags, wp } from '../helpers/common';
 import Avatar from './Avatar';
 import moment from 'moment';
 import Icon from '../assets/icons';
 import RenderHTML from 'react-native-render-html';
-import { getSupabaseFileUrl } from '../services/imageService';
+import { downloadFile, getSupabaseFileUrl } from '../services/imageService';
 import {Image} from 'expo-image'
 import { Video } from 'expo-av';
+import { createPostLike, removePostLike } from '../services/postService';
+import Loading from './Loading';
 
 interface Props {
   item: any,
-  currentUser: Object,
+  currentUser: any,
   navigation: any,
   hasShadow?: boolean,
 }
@@ -38,13 +40,54 @@ export default function PostCard(props: Props) {
 
   const { item, currentUser, navigation, hasShadow = false } = props;
 
+  const [likes, setLikes] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const createdAt = moment(item?.created_at).format('MMM D');
 
   async function openPostsDetail() {
-    
+    navigation.navigate('PostDetailScreen', {postId: item?.id})
   }
-  const likes = [];
-  const liked = true;
+
+  async function onLiked() {
+    if (liked) {
+      let updatedLikes = likes.filter(like => like?.userId != currentUser?.id);
+      setLikes([...updatedLikes])
+      let res = await removePostLike(item?.id, currentUser?.id);
+      if (!res.success) {
+        Alert.alert('Post', 'Something went wrong!')
+      }
+    } else {
+      let data = {
+        userId: currentUser?.id,
+        postId: item?.id
+      }
+      setLikes([...likes, data])
+      let res = await createPostLike(data);
+      if (!res.success) {
+        Alert.alert('Post', 'Something went wrong!')
+      }
+    }
+  }
+
+  async function onShare() {
+    let content = {message: stripHtmlTags(item?.body), url: null};
+    if (item?.file) {
+      setLoading(true);
+      let url = await downloadFile(getSupabaseFileUrl(item?.file).uri);
+      setLoading(false);
+      content.url = url;
+    }
+    Share.share(content);
+  }
+
+  const liked = likes.filter(like => like?.userId == currentUser?.id)[0] ? true : false;
+  console.log('post item: ', item);
+  
+  useEffect(() => {
+    setLikes(item?.postLikes)
+  }, [])
+  
 
   return (
     <View style={[styles.container, hasShadow && styles.shadowStyles]}>
@@ -110,7 +153,7 @@ export default function PostCard(props: Props) {
 
       <View style={styles.footer}>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onLiked}>
             <Icon
               name='heart'
               size={24}
@@ -125,7 +168,7 @@ export default function PostCard(props: Props) {
           </Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openPostsDetail}>
             <Icon
               name='comment'
               size={24}
@@ -134,18 +177,24 @@ export default function PostCard(props: Props) {
           </TouchableOpacity>
           <Text style={styles.count}>
             {
-              likes?.length
+              // likes?.length
             }
           </Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          {
+            loading ? (
+              <Loading
+                size='small'
+              />
+            ) : <TouchableOpacity onPress={onShare}>
             <Icon
               name='share'
               size={24}
               color={theme.colors.textLight}
             />
           </TouchableOpacity>
+          }
         </View>
       </View>
     </View>
