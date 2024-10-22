@@ -11,6 +11,7 @@ LogBox.ignoreLogs(['Warning: TNodeChildrenRenderer', 'Warning: MemoizedTNodeRend
 export default function App() {
   return (
     <Provider store={store}>
+      <StatusBar style='dark'/>
       <NavigationContainer>
         <RouteNavigator />
       </NavigationContainer>

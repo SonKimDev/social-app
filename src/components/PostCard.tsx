@@ -17,6 +17,7 @@ interface Props {
   currentUser: any,
   navigation: any,
   hasShadow?: boolean,
+  showMoreIcon?: boolean
 }
 
 const textStyle = {
@@ -38,7 +39,7 @@ const tagsStyles = {
 
 export default function PostCard(props: Props) {
 
-  const { item, currentUser, navigation, hasShadow = false } = props;
+  const { item, currentUser, navigation, hasShadow = false, showMoreIcon = true } = props;
 
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,12 +47,15 @@ export default function PostCard(props: Props) {
   const createdAt = moment(item?.created_at).format('MMM D');
 
   async function openPostsDetail() {
+    if (!showMoreIcon) {
+      return null;
+    }
     navigation.navigate('PostDetailScreen', {postId: item?.id})
   }
 
   async function onLiked() {
     if (liked) {
-      let updatedLikes = likes.filter(like => like?.userId != currentUser?.id);
+      let updatedLikes = likes ? likes.filter(like => like?.userId != currentUser?.id) : [];
       setLikes([...updatedLikes])
       let res = await removePostLike(item?.id, currentUser?.id);
       if (!res.success) {
@@ -69,6 +73,7 @@ export default function PostCard(props: Props) {
       }
     }
   }
+  
 
   async function onShare() {
     let content = {message: stripHtmlTags(item?.body), url: null};
@@ -85,8 +90,14 @@ export default function PostCard(props: Props) {
   console.log('post item: ', item);
   
   useEffect(() => {
-    setLikes(item?.postLikes)
-  }, [])
+    if (Array.isArray(item?.postLikes)) {
+      setLikes(item?.postLikes);
+    } else {
+      setLikes([]);
+    }
+  }, [item])
+  
+  console.log('item comments: ', item?.comments);
   
 
   return (
@@ -103,15 +114,18 @@ export default function PostCard(props: Props) {
             <Text style={styles.postTime}>{createdAt}</Text>
           </View>
         </View>
-
-        <TouchableOpacity onPress={openPostsDetail}>
-          <Icon
-            name='more'
-            size={hp(3.4)}
-            strokeWidth={3}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
+        {
+          showMoreIcon && (
+            <TouchableOpacity onPress={openPostsDetail}>
+              <Icon
+                name='more'
+                size={hp(3.4)}
+                strokeWidth={3}
+                color={theme.colors.text}
+              />
+            </TouchableOpacity>
+          )
+        }
       </View>
 
       <View style={styles.content}>
@@ -177,7 +191,7 @@ export default function PostCard(props: Props) {
           </TouchableOpacity>
           <Text style={styles.count}>
             {
-              // likes?.length
+              item?.comments[0].count
             }
           </Text>
         </View>
