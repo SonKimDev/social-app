@@ -11,12 +11,13 @@ interface Props {
   secureTextEntry?: boolean,
   multiline?: boolean,
   value?: string,
+  placeholderTextColor?: string,
   onChangeText?: (text: string) => void,
 }
 
 export default function Input(props: Props) {
 
-  const { icon, containerStyles, inputRef, placeholder, secureTextEntry = false, multiline = false, value, onChangeText } = props;
+  const { icon, containerStyles, inputRef, placeholder, secureTextEntry = false, multiline = false, value, placeholderTextColor = theme.colors.textLight, onChangeText } = props;
 
   return (
     <View style={[styles.container, containerStyles]}>
@@ -25,7 +26,7 @@ export default function Input(props: Props) {
       }
       <TextInput
         style={{flex: 1}}
-        placeholderTextColor={theme.colors.textLight}
+        placeholderTextColor={placeholderTextColor}
         ref={inputRef}
         placeholder={placeholder}
         onChangeText={onChangeText}
