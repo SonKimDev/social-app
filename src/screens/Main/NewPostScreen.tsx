@@ -1,5 +1,5 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ScreenWrapper from '../../components/ScreenWrapper'
 import Header from '../../components/Header'
 import { theme } from '../../constants/theme'
@@ -8,7 +8,7 @@ import Avatar from '../../components/Avatar'
 import { useSelector } from 'react-redux'
 import { selectUserData } from '../../store/auth/selector'
 import RichTextEditor from '../../components/RichTextEditor'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import { TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import Icon from '../../assets/icons'
 import Button from '../../components/Button'
@@ -19,7 +19,10 @@ import {Video} from 'expo-av'
 import { createOrUpdatePost } from '../../services/postService'
 
 export default function NewPostScreen() {
+  const route = useRoute();
 
+  const { post } = route.params || {};
+  
   const user = useSelector(selectUserData);
   
   const bodyRef = useRef('');
@@ -72,7 +75,7 @@ export default function NewPostScreen() {
       return file.type;
     }
 
-    if (file.inclues('postImage')) {
+    if (file.includes('postImage')) {
       return 'image';
     }
 
@@ -103,6 +106,10 @@ export default function NewPostScreen() {
       userId: user?.id,
     }
 
+    if (post && post.id) {
+      data.id = post.id;
+    }
+
     setLoading(true);
     let res = await createOrUpdatePost(data);
     setLoading(false);
@@ -116,6 +123,19 @@ export default function NewPostScreen() {
       Alert.alert('Post', res?.msg)
     }
   }
+
+  useEffect(() => {
+    if (post && post.id) {
+      bodyRef.current = post.body;
+      setFile(post.file || null);
+      setTimeout(() => {
+        if (editorRef?.current) {
+          editorRef.current.setContentHTML(post.body);
+        }
+      }, 300);
+    }
+  }, []);
+  
 
   return (
     <ScreenWrapper bg='white'>
@@ -200,7 +220,7 @@ export default function NewPostScreen() {
 
           <Button
             buttonStyle={{height: hp(6.2)}}
-            title='Post'
+            title={post && post.id ? 'Update' : 'Post'}
             loading={loading}
             hasShadow={false}
             onPress={onSubmit}

@@ -31,7 +31,7 @@ export default function HomeScreen() {
       return null;
     }
 
-    limit = limit + 4;
+    limit = limit + 10;
     let res = await fetchPosts(limit);
     if (res.success) {
       if (posts.length === res.data.length) {
@@ -45,10 +45,29 @@ export default function HomeScreen() {
     if (payload.eventType == 'INSERT' && payload?.new?.id) {
       let newPost = {...payload.new};
       let res = await getUserData(newPost.userId);
+      newPost.postLikes = [];
+      newPost.comments = [{count: 0}];
       newPost.user = res.success ? res.data : {};
       setPosts(prevPosts => [newPost, ...prevPosts])
     }
-    
+    if (payload.eventType == 'DELETE' && payload.old.id) {
+      setPosts(prevPost => {
+        let updatedPost = prevPost.filter(p => p.id != payload.old.id);
+        return updatedPost;
+      })
+    }
+    if (payload.eventType == 'UPDATE' && payload?.new?.id) {
+      setPosts(prevPosts => {
+        let updatedPost = prevPosts.map(post => {
+          if (post.id == payload.new.id) {
+            post.body = payload.new.body;
+            post.file = payload.new.file;
+          }
+          return post;
+        })
+        return updatedPost;
+      })
+    }
   }
 
   useEffect(() => {

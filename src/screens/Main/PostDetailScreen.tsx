@@ -1,7 +1,7 @@
 import { Alert, ScrollView, StyleSheet, TouchableOpacity, View, Text } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { createComment, fetchPostDetails, removeComment } from '../../services/postService';
+import { createComment, fetchPostDetails, removeComment, removePost } from '../../services/postService';
 import { hp, wp } from '../../helpers/common';
 import { theme } from '../../constants/theme';
 import PostCard from '../../components/PostCard';
@@ -88,6 +88,21 @@ export default function PostDetailScreen() {
     
   }
 
+  async function onDeletePost(item) {
+    let res = await removePost(post?.id);
+
+    if (res.success) {
+      navigation.goBack();
+    } else {
+      Alert.alert('post', res.msg);
+    }
+  }
+
+  async function onEditPost(item) {
+    navigation.goBack();
+    navigation.navigate('NewPostScreen', {post: item});
+  }
+
   useEffect(() => {
     let commentChannel = supabase
     .channel('comments')
@@ -130,6 +145,9 @@ export default function PostDetailScreen() {
           navigation={navigation}
           hasShadow={false}
           showMoreIcon={false}
+          showDelete={true}
+          onDelete={onDeletePost}
+          onEdit={onEditPost}
         />
 
         <View style={styles.inputContainer}>
