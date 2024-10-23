@@ -17,7 +17,10 @@ interface Props {
   currentUser: any,
   navigation: any,
   hasShadow?: boolean,
-  showMoreIcon?: boolean
+  showMoreIcon?: boolean,
+  showDelete?: boolean,
+  onDelete?: (item: any) => void,
+  onEdit?: (item: any) => void
 }
 
 const textStyle = {
@@ -39,7 +42,7 @@ const tagsStyles = {
 
 export default function PostCard(props: Props) {
 
-  const { item, currentUser, navigation, hasShadow = false, showMoreIcon = true } = props;
+  const { item, currentUser, navigation, hasShadow = false, showMoreIcon = true, showDelete = false, onDelete, onEdit } = props;
 
   const [likes, setLikes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -86,8 +89,22 @@ export default function PostCard(props: Props) {
     Share.share(content);
   }
 
+  async function handlePostDelete() {
+    Alert.alert('Comfirm', 'Are you sure you want to do this?', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel'
+      },
+      {
+        text: 'Delete',
+        onPress: () => onDelete(item),
+        style: 'destructive',
+      }
+    ])
+  }
+
   const liked = likes.filter(like => like?.userId == currentUser?.id)[0] ? true : false;
-  console.log('post item: ', item);
   
   useEffect(() => {
     if (Array.isArray(item?.postLikes)) {
@@ -97,9 +114,6 @@ export default function PostCard(props: Props) {
     }
   }, [item])
   
-  console.log('item comments: ', item?.comments);
-  
-
   return (
     <View style={[styles.container, hasShadow && styles.shadowStyles]}>
       <View style={styles.header}>
@@ -124,6 +138,29 @@ export default function PostCard(props: Props) {
                 color={theme.colors.text}
               />
             </TouchableOpacity>
+          )
+        }
+
+        {
+          showDelete && currentUser?.id === item?.userId && (
+            <View style={styles.actions}>
+              <TouchableOpacity onPress={() => onEdit(item)}>
+                <Icon
+                  name='edit'
+                  size={hp(2.5)}
+                  strokeWidth={3}
+                  color={theme.colors.text}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handlePostDelete}>
+                <Icon
+                  name='delete'
+                  size={hp(2.5)}
+                  strokeWidth={3}
+                  color={theme.colors.rose}
+                />
+              </TouchableOpacity>
+            </View>
           )
         }
       </View>

@@ -1,5 +1,5 @@
-import { StyleSheet, View, TouchableOpacity, Alert, Pressable, Text} from 'react-native'
-import React from 'react'
+import { StyleSheet, View, TouchableOpacity, Alert, Pressable, Text, FlatList} from 'react-native'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectUserData } from '../../store/auth/selector'
 import { useNavigation } from '@react-navigation/native';
@@ -11,12 +11,35 @@ import { theme } from '../../constants/theme';
 import { supabase } from '../../lib/supabase';
 import { clearAuth } from '../../store/auth';
 import Avatar from '../../components/Avatar';
+import { fetchPosts } from '../../services/postService';
+import PostCard from '../../components/PostCard';
+import Loading from '../../components/Loading';
+
+var limit = 0;
 
 export default function ProfileScreen() {
 
   const user = useSelector(selectUserData);
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const [posts, setPosts] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  async function getPosts() {
+    if (!hasMore) {
+      return null;
+    }
+
+    limit = limit + 10;
+    let res = await fetchPosts(limit, user?.id);
+    if (res.success) {
+      if (posts.length === res.data.length) {
+        setHasMore(false);
+      }
+      setPosts(res.data);
+    }
+  }
 
   async function onLogout() {
     dispatch(clearAuth());
@@ -47,7 +70,28 @@ export default function ProfileScreen() {
   
   return (
     <ScreenWrapper bg='white'>
-      <UserHeader user={user} navigation={navigation} handleLogout={() => handleLogout()}/>
+      <FlatList
+          data={posts}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={<UserHeader user={user} navigation={navigation} handleLogout={() => handleLogout()}/>}
+          ListHeaderComponentStyle={{marginBottom: 30}}
+          contentContainerStyle={styles.listStyle}
+          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => <PostCard item={item} currentUser={user} navigation={navigation}/>}
+          onEndReached={() => {
+            getPosts();
+          }}
+          onEndReachedThreshold={0}
+          ListFooterComponent={hasMore ? (
+            <View style={{marginVertical: posts.length === 0 ? 200 : 30}}>
+              <Loading/>
+            </View>
+          ): (
+            <View style={{marginVertical: 30}}>
+              <Text style={styles.noPost}>No more posts</Text>
+            </View>
+          )}
+        />
     </ScreenWrapper>
   )
 }
@@ -168,9 +212,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingBottom: 30
   },
-  noPosts: {
+  noPost: {
     fontSize: hp(2),
     textAlign: 'center',
     color: theme.colors.text
-  }
+  },
 })

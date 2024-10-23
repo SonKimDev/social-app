@@ -36,8 +36,6 @@ const LoginScreen = () => {
 
     setLoading(false);
 
-    // console.log('error: ', error);
-    
     if (error) {
       Alert.alert('Login', error.message);
     }

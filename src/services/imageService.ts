@@ -48,8 +48,6 @@ export const uploadFile = async (folderName, fileUri, isImage=true) => {
       contentType: isImage ? 'image/*' : 'video/*'
     });
 
-    console.log('data: ', data);
-    
 
     if (error) {
       console.log('file upload error: ', error);

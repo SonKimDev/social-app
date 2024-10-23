@@ -14,8 +14,6 @@ export default function RouteNavigator() {
   
   useEffect(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('session user: ', session?.user);
-      
       if (session?.user) { // Kiểm tra nếu session có user
         dispatch(setAuth(session.user));
         updateUserData(session.user);
@@ -27,7 +25,6 @@ export default function RouteNavigator() {
 
   const updateUserData = async (user) => {
     const res = await getUserData(user?.id);
-    console.log('API Response: ', res);
 
     if (res?.success) {
       const email = user?.email || null;

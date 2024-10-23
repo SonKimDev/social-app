@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet } from 'react-native'
-import { Home01Icon, CallIcon, Camera01Icon, Comment01Icon, Delete01Icon, Edit01Icon, FavouriteIcon, MoreHorizontalIcon, ArrowLeft01Icon, Image01Icon, Location01Icon, SquareLock02Icon, Logout01Icon, Mail01Icon, AddSquareIcon, Search01Icon, SentIcon, Share01Icon, UserIcon, Video01Icon } from 'hugeicons-react-native'
+import { Home01Icon, CallIcon, Camera01Icon, Comment01Icon, Delete02Icon, Edit01Icon, FavouriteIcon, MoreHorizontalIcon, ArrowLeft01Icon, Image01Icon, Location01Icon, SquareLock02Icon, Logout01Icon, Mail01Icon, AddSquareIcon, Search01Icon, SentIcon, Share01Icon, UserIcon, Video01Icon } from 'hugeicons-react-native'
 import { theme } from '../../constants/theme'
 
 const icons = {
@@ -8,7 +8,7 @@ const icons = {
   call: CallIcon,
   camera: Camera01Icon,
   comment: Comment01Icon,
-  delete: Delete01Icon,
+  delete: Delete02Icon,
   edit: Edit01Icon,
   heart: FavouriteIcon,
   more: MoreHorizontalIcon,
