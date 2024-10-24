@@ -13,12 +13,13 @@ import Icon from '../../assets/icons';
 import CommentItem from '../../components/CommentItem';
 import { supabase } from '../../lib/supabase';
 import { getUserData } from '../../services/userService';
+import { createNotification } from '../../services/notifivationService';
 
 export default function PostDetailScreen() {
   const route = useRoute();
   const navigation = useNavigation();
 
-  const { postId } = route.params || {};
+  const { postId, commentId } = route.params || {};
   const user = useSelector(selectUserData);
 
   const inputRef = useRef(null);
@@ -53,6 +54,15 @@ export default function PostDetailScreen() {
     setLoading(false);
 
     if (res.success) {
+      if (user.id != post.userId) {
+        let notify = {
+          senderId: user.id,
+          receiverId: post.userId,
+          title: 'commented your post',
+          data: JSON.stringify({postId: post.id, commentId: res?.data?.id})
+        }
+        createNotification(notify);
+      }
       inputRef?.current.clear();
       commentRef.current = '';
     } else {
@@ -181,6 +191,7 @@ export default function PostDetailScreen() {
               <CommentItem
                 key={comment?.id?.toString()}
                 item={comment}
+                highlight = {comment.id == commentId}
                 onDelete={onDeleteComment}
                 canDelete={user?.id == comment?.userId || user?.id == post?.id}
               />

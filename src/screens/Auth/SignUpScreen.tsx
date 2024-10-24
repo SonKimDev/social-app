@@ -1,4 +1,4 @@
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Alert, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigation } from '@react-navigation/native';
@@ -50,7 +50,7 @@ const SignUpScreen = () => {
   return (
     <ScreenWrapper bg={'white'}>
       <StatusBar style='dark'/>
-      <View style={styles.container}>
+      <Pressable style={styles.container} onPress={() => Keyboard.dismiss()}>
         <BackButton navigation={navigation} />
 
         <View>
@@ -99,7 +99,7 @@ const SignUpScreen = () => {
             </Text>
           </Pressable>
         </View>
-      </View>
+      </Pressable>
     </ScreenWrapper>
   )
 }

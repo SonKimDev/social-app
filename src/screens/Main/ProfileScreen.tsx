@@ -84,7 +84,11 @@ export default function ProfileScreen() {
           onEndReachedThreshold={0}
           ListFooterComponent={hasMore ? (
             <View style={{marginVertical: posts.length === 0 ? 200 : 30}}>
-              <Loading/>
+              {
+                posts.length !== 0 && (
+                  <Loading/>
+                )
+              }
             </View>
           ): (
             <View style={{marginVertical: 30}}>
