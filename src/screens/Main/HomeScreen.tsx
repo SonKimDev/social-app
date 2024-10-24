@@ -25,6 +25,7 @@ export default function HomeScreen() {
 
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   async function getPosts() {
     if (!hasMore) {
@@ -50,7 +51,7 @@ export default function HomeScreen() {
       newPost.user = res.success ? res.data : {};
       setPosts(prevPosts => [newPost, ...prevPosts])
     }
-    if (payload.eventType == 'DELETE' && payload.old.id) {
+    if (payload.eventType == 'DELETE' && payload.old?.id) {
       setPosts(prevPost => {
         let updatedPost = prevPost.filter(p => p.id != payload.old.id);
         return updatedPost;
@@ -70,17 +71,38 @@ export default function HomeScreen() {
     }
   }
 
+  async function handleNewNotification(payload) {
+    if (payload.eventType=='INSERT' && payload.new.id) {
+      setNotificationCount(prev => prev + 1);
+    }
+  }
+
   useEffect(() => {
+    let notificationChannel;
+
+
     let postChannel = supabase
     .channel('posts')
     .on('postgres_changes', {event: '*', schema: 'public', table: 'posts'}, handlePostEvent)
-    .subscribe()
-    getPosts();
+    .subscribe();
+
+    // getPosts();
+    
+    if (user?.id) {
+      notificationChannel = supabase
+      .channel('notifications')
+      .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'notifications', filter: `receiverId=eq.${user.id}`}, handleNewNotification)
+      .subscribe();
+    }
+
 
     return () => {
       supabase.removeChannel(postChannel);
+      if (notificationChannel) {
+        supabase.removeChannel(notificationChannel)
+      }
     }
-  }, [])
+  }, [user])
   
 
   return (
@@ -89,8 +111,18 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>Linkup</Text>
           <View style={styles.icons}>
-            <Pressable onPress={() => navigation.navigate('NotificationScreen')}>
+            <Pressable onPress={() => {
+              setNotificationCount(0);
+              navigation.navigate('NotificationScreen');
+            }}>
               <Icon name={'heart'} size={hp(3.2)} strokeWidth={2} color={theme.colors.text}/>
+              {
+                notificationCount > 0 && (
+                  <View style={styles.pill}>
+                    <Text style={styles.pillText}>{notificationCount}</Text>
+                  </View>
+                )
+              }
             </Pressable>
             <Pressable onPress={() => navigation.navigate('NewPostScreen')}>
               <Icon name={'plus'} size={hp(3.2)} strokeWidth={2} color={theme.colors.text}/>

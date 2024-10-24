@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { hp } from '../helpers/common';
 import { theme } from '../constants/theme';
@@ -9,12 +9,13 @@ import Icon from '../assets/icons';
 interface Props {
   item: any,
   canDelete?: boolean,
+  highlight?: boolean,
   onDelete: (item: any) => void;
 }
 
 export default function CommentItem(props: Props) {
 
-  const { item, canDelete = false, onDelete} = props;
+  const { item, canDelete = false, highlight = false, onDelete} = props;
 
   const createdAt = moment(item?.created_at).format('MMM d')
 
@@ -38,7 +39,7 @@ export default function CommentItem(props: Props) {
       <Avatar
         uri={item?.user?.image}
       />
-      <View style={styles.content}>
+      <View style={[styles.content, highlight && Platform.OS == 'ios' && styles.highlights]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
           <View style={styles.nameContainer}>
             <Text style={styles.text}>
